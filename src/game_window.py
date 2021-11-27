@@ -18,7 +18,7 @@ ALPHA_OFF           = 0
 
 
 def create_sprite_list_and_grid(rows, columns):
-    sprite_list = arcade.SpriteList()
+    sprite_list = arcade.SpriteList(is_static=True)
     sprite_grid = []
 
     for row in range(rows):
@@ -63,9 +63,9 @@ class PyGoL(arcade.Window):
         self.cell_grid.update()
         for x in range(ROWS):
             for y in range(COLUMNS):
-                if self.cell_grid.grid[x][y] == 1:
+                if self.cell_grid.grid[x][y] == 1 and self.sprite_grid[x][y].alpha == ALPHA_OFF:
                     self.sprite_grid[x][y].alpha = ALPHA_ON
-                else:
+                elif self.cell_grid.grid[x][y] == 0 and self.sprite_grid[x][y].alpha == ALPHA_ON:
                     self.sprite_grid[x][y].alpha = ALPHA_OFF
 
 
