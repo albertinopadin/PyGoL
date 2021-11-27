@@ -2,6 +2,7 @@ import arcade
 from arcade import color, draw_rectangle_filled
 from cell_grid import CellGrid
 
+# Heavily based on this example: https://api.arcade.academy/en/latest/examples/conway_alpha.html#conway-alpha
 
 WINDOW_TITLE        = "PyGoL"
 ROWS                = 90
