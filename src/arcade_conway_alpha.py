@@ -14,18 +14,21 @@ import arcade
 import random
 
 # Set how many rows and columns we will have
-ROW_COUNT = 90
-COLUMN_COUNT = 150
+# ROW_COUNT = 90
+# COLUMN_COUNT = 150
+
+ROW_COUNT = 120
+COLUMN_COUNT = 180
 
 # This sets the WIDTH and HEIGHT of each grid location
 # CELL_WIDTH = 15
 # CELL_HEIGHT = 15
-CELL_WIDTH = 5
-CELL_HEIGHT = 5
+CELL_WIDTH = 4
+CELL_HEIGHT = 4
 
 # This sets the margin between each cell
 # and on the edges of the screen.
-CELL_MARGIN = 0
+CELL_MARGIN = 1
 
 # Do the math to figure out our screen dimensions
 SCREEN_WIDTH = (CELL_WIDTH + CELL_MARGIN) * COLUMN_COUNT + CELL_MARGIN
@@ -62,7 +65,8 @@ def create_grids():
         for column in range(COLUMN_COUNT):
 
             # Make the sprite as a soft circle
-            sprite = arcade.SpriteCircle(CELL_WIDTH // 2, ALIVE_COLOR, soft=True)
+            # sprite = arcade.SpriteCircle(CELL_WIDTH // 2, ALIVE_COLOR, soft=True)
+            sprite = arcade.SpriteSolidColor(CELL_WIDTH, CELL_HEIGHT, ALIVE_COLOR)
 
             # Position the sprite
             x = column * (CELL_WIDTH + CELL_MARGIN) + (CELL_WIDTH / 2 + CELL_MARGIN)

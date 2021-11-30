@@ -5,10 +5,10 @@ from cell_grid import CellGrid
 # Heavily based on this example: https://api.arcade.academy/en/latest/examples/conway_alpha.html#conway-alpha
 
 WINDOW_TITLE        = "PyGoL"
-ROWS                = 90
-COLUMNS             = 150
+ROWS                = 120
+COLUMNS             = 180
 CELL_SIZE           = 4
-CELL_MARGIN         = 4
+CELL_MARGIN         = 1
 SCREEN_WIDTH        = (CELL_SIZE + CELL_MARGIN) * COLUMNS + CELL_MARGIN
 SCREEN_HEIGHT       = (CELL_SIZE + CELL_MARGIN) * ROWS + CELL_MARGIN
 BACKGROUND_COLOR    = color.DARK_SLATE_GRAY
@@ -25,7 +25,8 @@ def create_sprite_list_and_grid(rows, columns):
         sprite_grid.append([])
         for col in range(columns):
             # cell_sprite = arcade.SpriteCircle(CELL_SIZE, ALIVE_COLOR, soft=True)
-            cell_sprite = arcade.SpriteCircle(CELL_SIZE, ALIVE_COLOR, soft=False)
+            # cell_sprite = arcade.SpriteCircle(CELL_SIZE, ALIVE_COLOR, soft=False)
+            cell_sprite = arcade.SpriteSolidColor(CELL_SIZE, CELL_SIZE, ALIVE_COLOR)
             x = col * (CELL_SIZE + CELL_MARGIN) + (CELL_SIZE/2 + CELL_MARGIN)
             y = row * (CELL_SIZE + CELL_MARGIN) + (CELL_SIZE/2 + CELL_MARGIN)
             cell_sprite.center_x = x
