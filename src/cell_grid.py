@@ -9,13 +9,21 @@ class CellGrid:
         self.x = x
         self.y = y
         self.grid = self.init_cell_grid(x, y, all_live)
+        self.updateBuffer = [
+            [
+                0, 0, 0, 1, 0, 0, 0, 0, 0
+            ], 
+            [
+                0, 0, 1, 1, 0, 0, 0, 0, 0
+            ]
+        ]
     
 
     def init_cell_grid(self, x, y, all_live):
         if not all_live:
-            return np.zeros((x,y))
+            return np.zeros((x,y), dtype=np.uint8)
         else:
-            return np.ones((x,y))
+            return np.ones((x,y), dtype=np.uint8)
     
 
     def get_live_neighbors(self):
@@ -39,12 +47,14 @@ class CellGrid:
             for y in range(self.y):
                 ln = live_neighbors[x][y]
                 cell = self.grid[x][y]
-                if cell == 1 and 2 <= ln < 4:
-                    pass  # Keep cell alive
-                elif cell == 0 and ln == 3:
-                    self.grid[x][y] = 1
-                else:
-                    self.grid[x][y] = 0
+                # if cell == 1 and 2 <= ln < 4:
+                #     pass  # Keep cell alive
+                # elif cell == 0 and ln == 3:
+                #     self.grid[x][y] = 1
+                # else:
+                #     self.grid[x][y] = 0
+
+                self.grid[x][y] = self.updateBuffer[cell][ln]
 
 
     def reset(self):
