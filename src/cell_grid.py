@@ -84,7 +84,7 @@ class CellGrid:
 
     # Life rule for 3x3 collection of cells; E is the center:
     def life(self, a, b, c, d, E, f, g, h, i):
-        outer = sum(t.n for t in [a, b, c, d, f, g, h, i]])
+        outer = sum(t.n for t in [a, b, c, d, f, g, h, i])
         return on if (E.n and outer == 2) or outer == 3 else off
 
 
@@ -129,12 +129,107 @@ class CellGrid:
                     successor(join(c4, c5, c7, c8), j),
                     successor(join(c5, c6, c8, c9), j),
                 )
-                
+
         return s
 
 
+    def advance(self, node, n):
+        if n == 0:
+            return node
+
+        # Get binary expansion, make sure padded enough
+        bits = []
+        while n > 0:
+            bits.append(n & 1)
+            n = n >> 1
+            node = self.center(node)  # nest
+
+        for k, bit in enumerate(reversed(bits)):
+            j = len(bits) - k - 1
+            if bit:
+                node = self.successor(node, j)
+
+        return node
+
+
+    # Simulate as fast as possible:
+    def ffwd(self, node, n):
+        for i in range(n):
+            while (node.k < 3 or node.a.n != node.a.d.d.n or
+                   node.b.n != node.b.c.c.n or 
+                   node.c.n != node.c.b.b.n or
+                   node.d.n != node.d.a.a.n):
+                   node = self.center(node)
+            node = self.successor(node)
+        return node
+
+
+    # Pack / unpack data to/from quadtree format:
+    """
+    Turn a quadtree a list of (x,y,gray) triples 
+    in the rectangle (x,y) -> (clip[0], clip[1]) (if clip is not-None).    
+    If `level` is given, quadtree elements at the given level are given 
+    as a grayscale level 0.0->1.0,  "zooming out" the display.
+    """
+    def expand(self, node, x=0, y=0, clip=None, level=0):
+        if node.n == 0:
+            return []
+
+        size = 2 ** node.k
+        
+        if clip is not None:
+            if x + size < clip[0] or x > clip[1] or \
+               y + size < clip[2] or y > clip[3]:
+               return []
+
+        if node.k == level:
+            # Base case
+            gray = node.n / (size ** 2)
+            return [(x >> level, y >> level, gray)]
+        else:
+            # Return all points contained inside this node
+            offset = size >> 1
+            return (
+                self.expand(node.a, x, y, clip, level) +
+                self.expand(node.b, x + offset, y, clip, level) +
+                self.expand(node.c, x, y + offset, clip, level) +
+                self.expand(node.d, x + offset, y + offset, clip, level)
+            )
+
+    
+    """Turn a list of (x,y) coordinates into a quadtree"""
+    def construct(self, pts):
+        # Force start at (0, 0)
+        min_x = min(*[x for x, y in pts])
+        min_y = min(*[y for x, y in pts])
+        pattern = {(x - min_x, y - min_y): on for x, y in pts}
+        k = 0
+
+        while len(pattern) != 1:
+            # Bottom-up construction:
+            next_level = {}
+            z = self.get_zero(k)
+            
+            while len(pattern) > 0:
+                x, y = next(iter(pattern))
+                x, y = x - (x & 1), y - (y & 1)
+                
+                a = pattern.pop((x, y), z)
+                b = pattern.pop((x + 1, y), z)
+                c = pattern.pop((x, y + 1), z)
+                d = pattern.pop((x + 1, y + 1), z)
+                next_level[x >> 1, y >> 1] = self.join(a,b,c,d)
+
+            # Merge at the next level:
+            pattern = next_level
+            k += 1
+        
+        return pattern.popitem()[1]
+
+
+
     # From: https://johnhw.github.io/hashlife/index.md.html
-    def update(self):
+    # def update(self):
 
 
     # def reset(self):
