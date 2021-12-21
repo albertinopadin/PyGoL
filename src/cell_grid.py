@@ -89,11 +89,11 @@ class CellGrid:
 
 
     def life_4x4(self, m):
-        ad = life(m.a.a, m.a.b, m.b.a, m.a.c, m.a.d, m.b.c, m.c.a, m.c.b, m.d.a)
-        bc = life(m.a.b, m.b.a, m.b.b, m.a.d, m.b.c, m.b.d, m.c.b, m.d.a, m.d.b)
-        cb = life(m.a.c, m.a.d, m.b.c, m.c.a, m.c.b, m.d.a, m.c.c, m.c.d, m.d.c)
-        da = life(m.a.d, m.b.c, m.b.d, m.c.b, m.d.a, m.d.b, m.c.d, m.c.d, m.d.d)
-        return self.join(ab, bc, cb, da)
+        ad = self.life(m.a.a, m.a.b, m.b.a, m.a.c, m.a.d, m.b.c, m.c.a, m.c.b, m.d.a)
+        bc = self.life(m.a.b, m.b.a, m.b.b, m.a.d, m.b.c, m.b.d, m.c.b, m.d.a, m.d.b)
+        cb = self.life(m.a.c, m.a.d, m.b.c, m.c.a, m.c.b, m.d.a, m.c.c, m.c.d, m.d.c)
+        da = self.life(m.a.d, m.b.c, m.b.d, m.c.b, m.d.a, m.d.b, m.c.d, m.c.d, m.d.d)
+        return self.join(ad, bc, cb, da)
     
 
     @lru_cache(maxsize=2**24)
@@ -105,29 +105,29 @@ class CellGrid:
             s = self.life_4x4(m)
         else:
             j = m.k - 2 if j is None else min(j, m.k - 2)
-            c1 = successor(join(m.a.a, m.a.b, m.a.c, m.a.d), j)
-            c2 = successor(join(m.a.b, m.b.a, m.a.d, m.b.c), j)
-            c3 = successor(join(m.b.a, m.b.b, m.b.c, m.b.d), j)
-            c4 = successor(join(m.a.c, m.a.d, m.c.a, m.c.b), j)
-            c5 = successor(join(m.a.d, m.b.c, m.c.b, m.d.a), j)
-            c6 = successor(join(m.b.c, m.b.d, m.d.a, m.d.b), j)
-            c7 = successor(join(m.c.a, m.c.b, m.c.c, m.c.d), j)
-            c8 = successor(join(m.c.b, m.d.a, m.c.d, m.d.c), j)
-            c9 = successor(join(m.d.a, m.d.b, m.d.c, m.d.d), j)
+            c1 = self.successor(self.join(m.a.a, m.a.b, m.a.c, m.a.d), j)
+            c2 = self.successor(self.join(m.a.b, m.b.a, m.a.d, m.b.c), j)
+            c3 = self.successor(self.join(m.b.a, m.b.b, m.b.c, m.b.d), j)
+            c4 = self.successor(self.join(m.a.c, m.a.d, m.c.a, m.c.b), j)
+            c5 = self.successor(self.join(m.a.d, m.b.c, m.c.b, m.d.a), j)
+            c6 = self.successor(self.join(m.b.c, m.b.d, m.d.a, m.d.b), j)
+            c7 = self.successor(self.join(m.c.a, m.c.b, m.c.c, m.c.d), j)
+            c8 = self.successor(self.join(m.c.b, m.d.a, m.c.d, m.d.c), j)
+            c9 = self.successor(self.join(m.d.a, m.d.b, m.d.c, m.d.d), j)
 
             if j < m.k - 2:
-                s = join(
-                    (join(c1.d, c2.c, c4.b, c5.a)),
-                    (join(c2.d, c3.c, c5.b, c6.a)),
-                    (join(c4.d, c5.c, c7.b, c8.a)),
-                    (join(c5.d, c6.c, c8.b, c9.a)),
+                s = self.join(
+                    (self.join(c1.d, c2.c, c4.b, c5.a)),
+                    (self.join(c2.d, c3.c, c5.b, c6.a)),
+                    (self.join(c4.d, c5.c, c7.b, c8.a)),
+                    (self.join(c5.d, c6.c, c8.b, c9.a)),
                 )
             else:
-                s = join(
-                    successor(join(c1, c2, c4, c5), j),
-                    successor(join(c2, c3, c5, c6), j),
-                    successor(join(c4, c5, c7, c8), j),
-                    successor(join(c5, c6, c8, c9), j),
+                s = self.join(
+                    self.successor(self.join(c1, c2, c4, c5), j),
+                    self.successor(self.join(c2, c3, c5, c6), j),
+                    self.successor(self.join(c4, c5, c7, c8), j),
+                    self.successor(self.join(c5, c6, c8, c9), j),
                 )
 
         return s
