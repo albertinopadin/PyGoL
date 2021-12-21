@@ -24,6 +24,10 @@ class CellGrid:
     def __init__(self, x, y, all_live=False):
         self.x = x
         self.y = y
+        self.init_pts = [(0,0), (x,y)]
+        self.qt_node = self.construct(self.init_pts)
+        self.grid_pts = self.expand(self.qt_node)
+
         # self.grid = self.init_cell_grid(x, y, all_live)
         # self.updateBuffer = [
         #     [
@@ -229,19 +233,25 @@ class CellGrid:
 
 
     # From: https://johnhw.github.io/hashlife/index.md.html
-    # def update(self):
+    def update(self):
+        # self.qt_node = self.ffwd(self.qt_node, 1)
+        self.qt_node = self.advance(self.qt_node, 1)
+        self.grid_pts = self.expand(self.qt_node)
 
 
-    # def reset(self):
-    #     for x in range(self.x):
-    #         for y in range(self.y):
-    #             self.grid[x][y] = 0
+    def reset(self):
+        self.qt_node = self.construct(self.init_pts)
+        self.grid_pts = self.expand(self.qt_node)
 
 
-    # def randomize(self):
-    #     self.reset()
-    #     for x in range(self.x):
-    #         for y in range(self.y):
-    #             r = int(random()*100)
-    #             if r <= CellGrid.DEFAULT_LIVE_PROBABILITY:
-    #                 self.grid[x][y] = 1
+    def randomize(self):
+        self.reset()
+        randpts = []
+        for x in range(self.x):
+            for y in range(self.y):
+                r = int(random()*100)
+                if r <= CellGrid.DEFAULT_LIVE_PROBABILITY:
+                    randpts.append((x,y))
+
+        self.qt_node = self.construct(randpts)
+        self.grid_pts = self.expand(self.qt_node)

@@ -49,10 +49,10 @@ class PyGoL(arcade.Window):
     
     def randomize(self):
         self.cell_grid.randomize()
-        for x in range(ROWS):
-            for y in range(COLUMNS):
-                if self.cell_grid.grid[x][y] == 1:
-                    self.sprite_grid[x][y].alpha = ALPHA_ON
+        for pt in self.cell_grid.grid_pts:
+            x, y, _ = pt
+            if x < ROWS and y < COLUMNS:
+                self.sprite_grid[x][y].alpha = ALPHA_ON
 
 
     def on_draw(self):
@@ -61,13 +61,21 @@ class PyGoL(arcade.Window):
 
     
     def on_update(self, delta_time):
-        self.cell_grid.update()
+        # Hack for now
+        # Turn off all:
         for x in range(ROWS):
             for y in range(COLUMNS):
-                if self.cell_grid.grid[x][y] == 1 and self.sprite_grid[x][y].alpha == ALPHA_OFF:
-                    self.sprite_grid[x][y].alpha = ALPHA_ON
-                elif self.cell_grid.grid[x][y] == 0 and self.sprite_grid[x][y].alpha == ALPHA_ON:
+                if self.sprite_grid[x][y].alpha == ALPHA_ON:
                     self.sprite_grid[x][y].alpha = ALPHA_OFF
+
+        self.cell_grid.update()
+        for pt in self.cell_grid.grid_pts:
+            x, y, _ = pt
+            if x < ROWS and y < COLUMNS:
+                if self.sprite_grid[x][y].alpha == ALPHA_OFF:
+                    self.sprite_grid[x][y].alpha = ALPHA_ON
+
+        
 
 
 def main():
