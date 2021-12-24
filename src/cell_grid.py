@@ -1,9 +1,9 @@
 from collections import namedtuple
 from functools import lru_cache
 from random import random
-import numpy as np
 
 _Node = namedtuple('Node', ['k', 'a', 'b', 'c', 'd', 'n', 'hash'])
+
 
 class Node(_Node):
     def __hash__(self):
@@ -28,39 +28,6 @@ class CellGrid:
         self.qt_node = self.construct(self.init_pts)
         self.grid_pts = self.expand(self.qt_node)
 
-        # self.grid = self.init_cell_grid(x, y, all_live)
-        # self.updateBuffer = [
-        #     [
-        #         0, 0, 0, 1, 0, 0, 0, 0, 0
-        #     ], 
-        #     [
-        #         0, 0, 1, 1, 0, 0, 0, 0, 0
-        #     ]
-        # ]
-    
-
-    # def init_cell_grid(self, x, y, all_live):
-    #     if not all_live:
-    #         return np.zeros((x,y), dtype=np.uint8)
-    #     else:
-    #         return np.ones((x,y), dtype=np.uint8)
-    
-
-    # def get_live_neighbors(self):
-    #     pad_top             = np.pad(self.grid, ((2,0), (1,1)))
-    #     pad_top_right       = np.pad(self.grid, ((2,0), (0,2)))
-    #     pad_right           = np.pad(self.grid, ((1,1), (0,2)))
-    #     pad_bottom_right    = np.pad(self.grid, ((0,2), (0,2)))
-    #     pad_bottom          = np.pad(self.grid, ((0,2), (1,1)))
-    #     pad_bottom_left     = np.pad(self.grid, ((0,2), (2,0)))
-    #     pad_left            = np.pad(self.grid, ((1,1), (2,0)))
-    #     pad_top_left        = np.pad(self.grid, ((2,0), (2,0)))
-
-    #     return (pad_top + pad_top_right + pad_right + \
-    #             pad_bottom_right + pad_bottom + pad_bottom_left + \
-    #             pad_left + pad_top_left)[1:-1, 1:-1]  # Unpad result
-
-
     @lru_cache(maxsize=2**24)
     def join(self, a, b, c, d):
         n = a.n + b.n + c.n + d.n
@@ -71,12 +38,10 @@ class CellGrid:
         ) & ((1 << 63) - 1)
         return Node(a.k + 1, a, b, c, d, n, nhash)
 
-
     @lru_cache(maxsize=1024)
     def get_zero(self, k):
         return off if k==0 else self.join(self.get_zero(k-1), self.get_zero(k-1),
                                           self.get_zero(k-1), self.get_zero(k-1))
-
 
     def center(self, m):
         z = self.get_zero(m.k - 1)
@@ -85,12 +50,10 @@ class CellGrid:
             self.join(z, m.c, z, z), self.join(m.d, z, z, z)
         )
 
-
     # Life rule for 3x3 collection of cells; E is the center:
     def life(self, a, b, c, d, E, f, g, h, i):
         outer = sum(t.n for t in [a, b, c, d, f, g, h, i])
         return on if (E.n and outer == 2) or outer == 3 else off
-
 
     def life_4x4(self, m):
         ad = self.life(m.a.a, m.a.b, m.b.a, m.a.c, m.a.d, m.b.c, m.c.a, m.c.b, m.d.a)
@@ -98,7 +61,6 @@ class CellGrid:
         cb = self.life(m.a.c, m.a.d, m.b.c, m.c.a, m.c.b, m.d.a, m.c.c, m.c.d, m.d.c)
         da = self.life(m.a.d, m.b.c, m.b.d, m.c.b, m.d.a, m.d.b, m.c.d, m.c.d, m.d.d)
         return self.join(ad, bc, cb, da)
-    
 
     @lru_cache(maxsize=2**24)
     def successor(self, m, j=None):
@@ -136,7 +98,6 @@ class CellGrid:
 
         return s
 
-
     def advance(self, node, n):
         if n == 0:
             return node
@@ -155,7 +116,6 @@ class CellGrid:
 
         return node
 
-
     # Simulate as fast as possible:
     def ffwd(self, node, n):
         for i in range(n):
@@ -166,7 +126,6 @@ class CellGrid:
                    node = self.center(node)
             node = self.successor(node)
         return node
-
 
     # Pack / unpack data to/from quadtree format:
     """
@@ -199,7 +158,6 @@ class CellGrid:
                 self.expand(node.c, x, y + offset, clip, level) +
                 self.expand(node.d, x + offset, y + offset, clip, level)
             )
-
     
     """Turn a list of (x,y) coordinates into a quadtree"""
     def construct(self, pts):
@@ -230,19 +188,15 @@ class CellGrid:
         
         return pattern.popitem()[1]
 
-
-
     # From: https://johnhw.github.io/hashlife/index.md.html
     def update(self):
         # self.qt_node = self.ffwd(self.qt_node, 1)
         self.qt_node = self.advance(self.qt_node, 1)
         self.grid_pts = self.expand(self.qt_node)
 
-
     def reset(self):
         self.qt_node = self.construct(self.init_pts)
         self.grid_pts = self.expand(self.qt_node)
-
 
     def randomize(self):
         self.reset()
