@@ -8,15 +8,14 @@ class CellGrid:
     def __init__(self, x, y, all_live=False):
         self.x = x
         self.y = y
-        self.grid = self.init_cell_grid(x, y, all_live)
-    
+        self.grid = CellGrid.init_cell_grid(x, y, all_live)
 
-    def init_cell_grid(self, x, y, all_live):
+    @staticmethod
+    def init_cell_grid(x, y, all_live):
         if not all_live:
             return np.zeros((x,y))
         else:
             return np.ones((x,y))
-    
 
     def get_live_neighbors(self):
         pad_top             = np.pad(self.grid, ((2,0), (1,1)))
@@ -32,7 +31,6 @@ class CellGrid:
                 pad_bottom_right + pad_bottom + pad_bottom_left + \
                 pad_left + pad_top_left)[1:-1, 1:-1]  # Unpad result
 
-    # TODO: Fix the rules, this seems screwy...
     def update(self):
         live_neighbors = self.get_live_neighbors()
         for x in range(self.x):
@@ -46,12 +44,10 @@ class CellGrid:
                 else:
                     self.grid[x][y] = 0
 
-
     def reset(self):
         for x in range(self.x):
             for y in range(self.y):
                 self.grid[x][y] = 0
-
 
     def randomize(self):
         self.reset()

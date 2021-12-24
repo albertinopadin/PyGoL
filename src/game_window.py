@@ -38,7 +38,6 @@ def create_sprite_list_and_grid(rows, columns):
 
 
 class PyGoL(arcade.Window):
-    
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
         arcade.set_background_color(BACKGROUND_COLOR)
@@ -46,7 +45,6 @@ class PyGoL(arcade.Window):
         self.cell_grid = CellGrid(ROWS, COLUMNS)
         self.randomize()
 
-    
     def randomize(self):
         self.cell_grid.randomize()
         for x in range(ROWS):
@@ -54,12 +52,10 @@ class PyGoL(arcade.Window):
                 if self.cell_grid.grid[x][y] == 1:
                     self.sprite_grid[x][y].alpha = ALPHA_ON
 
-
     def on_draw(self):
         arcade.start_render()
         self.sprite_list.draw()
 
-    
     def on_update(self, delta_time):
         self.cell_grid.update()
         for x in range(ROWS):
